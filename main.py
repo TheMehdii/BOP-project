@@ -169,8 +169,8 @@ class StatisticalAnalyzer:
         self.theoretical_mean = 0.0
     
     def run_simulation(self):
-        self.samples = [self.dist_instance.generate_sample()]
-        self._calculate_emirical_metrics()
+        self.samples = [self.dist_instance.generate_sample() for i in range(self.M)]
+        self._calculate_empirical_metrics()
         self._calculate_theoretical_metrics()
 
     def _calculate_empirical_metrics(self):
@@ -217,6 +217,10 @@ class StatisticalAnalyzer:
             self.theoretical_mean = mu 
             self.theoretical_var = sigma ** 2
         
+    def calculate_error(self, theoretical, empirical):
+        if theoretical == 0:
+            return 0.0 if empirical == 0 else float('inf')
+        return abs((theoretical - empirical) / theoretical) * 100
     def generate_report(self):
         mean_error = self.calculate_error(self.theoretical_mean, self.empirical_mean)
         var_error = self.calculate_error(self.theoretical_var, self.empirical_var)
