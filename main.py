@@ -253,3 +253,34 @@ class TheoremProver:
         به دلیل ممنوعیت استفاده از scipy
         """
         return 0.5 * (1 + math.erf((x - mu) / (sigma * math.sqrt(2.0))))
+    def prove_memoryless_property(self, dist_instance, s, t, M=100000):
+        """
+        بررسی خاصیت بی‌حافظگی برای توزیع‌های هندسی و نمایی
+        P(X > s + t | X > s) ≈ P(X > t)
+        """
+        print("\n" + "=" * 60)
+        print(" EVALUATING MEMORYLESS PROPERTY ")
+        print("=" * 60)
+        
+        samples = [dist_instance.generate_sample() for _ in range(M)]
+        
+        count_gt_t = sum(1 for x in samples if x > t)
+        count_gt_s = sum(1 for x in samples if x > s)
+        count_gt_s_plus_t = sum(1 for x in samples if x > (s + t))
+        
+        p_gt_t = count_gt_t / M
+        p_gt_s = count_gt_s / M
+        p_gt_s_plus_t = count_gt_s_plus_t / M
+        
+        if p_gt_s == 0:
+            print(f"خطا: هیچ نمونه‌ای بزرگتر از s={s} تولید نشد. امکان محاسبه احتمال شرطی وجود ندارد.")
+            return
+            
+        p_conditional = p_gt_s_plus_t / p_gt_s
+        difference = abs(p_conditional - p_gt_t)
+        
+        print(f" P(X > {t}) = {p_gt_t:.6f}")
+        print(f" P(X > {s} + {t} | X > {s}) = {p_conditional:.6f}")
+        print("-" * 60)
+        print(f" Difference (Absolute Error): {difference:.6f}")
+        print("=" * 60)
