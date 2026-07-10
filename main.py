@@ -243,3 +243,13 @@ class StatisticalAnalyzer:
         print("=" * 60)
 if __name__ == "__main__":
     run_comparison()
+class TheoremProver:
+    def __init__(self, rnd_engine):
+        self.rnd = rnd_engine
+        
+    def _normal_cdf(self, x, mu, sigma):
+        """
+        محاسبه تابع توزیع تجمعی (CDF) توزیع نرمال با استفاده از math.erf 
+        به دلیل ممنوعیت استفاده از scipy
+        """
+        return 0.5 * (1 + math.erf((x - mu) / (sigma * math.sqrt(2.0))))
