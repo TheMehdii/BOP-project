@@ -295,15 +295,12 @@ class TheoremProver:
         binom_dist = Binomial(n, p, self.rnd)
         samples = [binom_dist.generate_sample() for _ in range(M)]
         
-        # محاسبه تجربی
         count_in_range = sum(1 for x in samples if a <= x <= b)
         p_empirical = count_in_range / M
         
-        # محاسبه تئوریک (توزیع نرمال) با تصحیح پیوستگی
         mu = n * p
         sigma = math.sqrt(n * p * (1 - p))
         
-        # Continuity Correction: [a-0.5, b+0.5]
         p_theoretical = self._normal_cdf(b + 0.5, mu, sigma) - self._normal_cdf(a - 0.5, mu, sigma)
         
         error = abs((p_theoretical - p_empirical) / p_theoretical) * 100 if p_theoretical != 0 else float('inf')
@@ -313,4 +310,30 @@ class TheoremProver:
         print("-" * 60)
         print(f" Absolute Error Percentage: {error:.4f}%")
         print("=" * 60)
+    def prove_poisson_normal_approximation(self, lam, a, b, M=100000):
+        print("\n" + "=" * 60)
+        print(" POISSON TO NORMAL APPROXIMATION THEOREM ")
+        print("=" * 60)
         
+        if lam < 30:
+            print("هشدار: برای تقریب مناسب، مقدار λ (لامبدا) باید حداقل 30 باشد.")
+            
+        poisson_dist = Poisson(lam, self.rnd)
+        samples = [poisson_dist.generate_sample() for _ in range(M)]
+        
+        count_in_range = sum(1 for x in samples if a <= x <= b)
+        p_empirical = count_in_range / M
+        
+        mu = lam
+        sigma = math.sqrt(lam)
+        
+        p_theoretical = self._normal_cdf(b + 0.5, mu, sigma) - self._normal_cdf(a - 0.5, mu, sigma)
+        
+        error = abs((p_theoretical - p_empirical) / p_theoretical) * 100 if p_theoretical != 0 else float('inf')
+        
+        print(f" Empirical P({a} <= X <= {b}) (Poisson): {p_empirical:.6f}")
+        print(f" Theoretical P({a}-0.5 <= X <= {b}+0.5) (Normal): {p_theoretical:.6f}")
+        print("-" * 60)
+        print(f" Absolute Error Percentage: {error:.4f}%")
+        print("=" * 60)
+    
