@@ -336,26 +336,30 @@ class TheoremProver:
 green = "\033[92m"
 reset = "\033[0m"
 def menu():
-    print(f"{green} Welcome to Probability and Statistics{reset}")
+    print(f"{green}         Welcome to Probability and Statistics sumulation Simulator Kernel{reset}")
     time.sleep(3)
     print("Running engine motor ...")
     time.sleep(3)
     os.system('cls')
     
-    print("Select avtive Random Engine for sumulation :")
+    print("Select avtive Random Engine for Simulation ")
     print("1. Linear Congruential Generator (LCG)")
     print("2. Xorshift")
     choice = input("Enter your choice : ").strip()
 
     if choice == 2:
+        time.sleep(3)
+        os.system('cls')
         engine = Xorshift()
         print(f"{green}Active engine set to --> Xorshift{reset}")
     else : 
+        time.sleep(3)
+        os.system('cls')
         engine = Linear_Congruential_Generator()
         print(f"{green}Active engine set to : LCG{reset}")
 
     while True:
-        print("      Main Menu       ")
+        print("======== Main Menu ========")
         print("1. Phase 1 & 2: Run Distribution Simulation & Statistical Report")
         print("2. phase 3: Evaluate Memoryless Property (Geometric / Expoential)")
         print("3. Phase 3: Binomial to Normal Approximation Theorem")
@@ -385,4 +389,73 @@ def menu():
                 p = float(input("Enter p (0 < p < 1): "))
                 dist_instance = Binomial(n, p, engine)
                 dist_name = 'Binomial'
+            elif dist_choice == '3':
+                p = float(input("Enter p (0 < p < 1): "))
+                dist_instance - Geometric(p, engine)
+                dist_name = 'Geometric'
+            elif dist_choice == '4':
+                lam =  float(input("Enter lambda (λ > 0) : "))
+                dist_instance = Exponential(lam, engine)
+                dist_name = 'Exponential'
+            elif dist_choice == '6':
+                mu = float(input("Enter Mean (μ) : "))
+                sigma = float(input("Enter std dev (σ): "))
+                dist_instance = Normal(mu, sigma, engine)
+                dist_name = 'Normal'
+            else:
+                print("Invalid distribution selection!")
+                continue
+
+            analyzer  = StatisticalAnalyzer(dist_name, dist_instance, M)
+            analyzer.run_simulation()
+            analyzer.generate_report()
+        
+        elif menu_choice == '2':
+            print("\nMemoryless Property Evaluation:")
+            print("1. Geometric\n2. Exponential")
+            m_choice = input("Choice (1-2): ").strip()
+            s = float(input("Enter s: "))
+            t = float(input("Enter t: "))
+            M = int(input("Enter M (e.g. 100000): "))
+            
+            
+            prover = TheoremProver(engine)
+            if m_choice == '1':
+                p = float(input("Enter p (0 < p < 1): "))
+                dist = Geometric(p, engine)
+            else:
+                lam = float(input("Enter lambda (λ > 0): "))
+                dist = Exponential(lam, engine)
                 
+            prover.prove_memoryless_property(dist, s, t, M)
+            
+        elif menu_choice == '3':
+            n = int(input("Enter n (recommended >= 50): "))
+            p = float(input("Enter p (0 < p < 1): "))
+            a = int(input("Enter lower bound a: "))
+            b = int(input("Enter upper bound b: "))
+            M = int(input("Enter M: "))
+            
+            prover = TheoremProver(engine)
+            prover.prove_binomial_normal_approximation(n, p, a, b, M)
+            
+        elif menu_choice == '4':
+            lam = float(input("Enter lambda (λ, recommended >= 30): "))
+            a = int(input("Enter lower bound a: "))
+            b = int(input("Enter upper bound b: "))
+            M = int(input("Enter M: "))
+            
+            prover = TheoremProver(engine)
+            prover.prove_poisson_normal_approximation(lam, a, b, M)
+            
+        elif menu_choice == '5':
+            print("Goodbye!")
+            break
+        else:
+            time.sleep(2)
+            print("Invalid option. Try again.")
+            time.sleep(3)
+            os.system('cls')
+
+if __name__ == "__main__":
+    menu()
