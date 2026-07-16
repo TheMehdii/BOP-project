@@ -349,7 +349,40 @@ def menu():
 
     if choice == 2:
         engine = Xorshift()
-        print("Active engine set to --> Xorshift")
+        print(f"{green}Active engine set to --> Xorshift{reset}")
     else : 
         engine = Linear_Congruential_Generator()
-        print("Active engine set to : LCG")
+        print(f"{green}Active engine set to : LCG{reset}")
+
+    while True:
+        print("      Main Menu       ")
+        print("1. Phase 1 & 2: Run Distribution Simulation & Statistical Report")
+        print("2. phase 3: Evaluate Memoryless Property (Geometric / Expoential)")
+        print("3. Phase 3: Binomial to Normal Approximation Theorem")
+        print("4. Phase 3: Poisson to Normal Approximation Theorem")
+        print("5. Exit")
+
+        menu_choice = input("Select an option (1-5): ").strip()
+
+
+        if menu_choice == '1':
+            time.sleep(3)
+            os.system('cls')
+            print("\nSelect Distribution:")
+            print("1. Bernolli\n2. Binomial\n 3. Geometric\n4. Poisson\n5. Exponential\n6. Normal")
+            dist_choice =input("Choice (1-6): ").strip()
+            M = int(input("Enter number of simulations : "))
+
+            dist_instance = None
+            dist_name = ""
+
+            if dist_choice == '1':
+                p = float(input("Enter p (0 < p < 1): "))
+                dist_instance = Bernolli(p, engine)
+                dist_name = 'Bernolli'
+            elif dist_choice == '2':
+                n = int(input("Enter n (Number of trials): "))
+                p = float(input("Enter p (0 < p < 1): "))
+                dist_instance = Binomial(n, p, engine)
+                dist_name = 'Binomial'
+                
