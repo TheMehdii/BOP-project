@@ -243,3 +243,91 @@ class StatisticalAnalyzer:
         print("=" * 60)
 if __name__ == "__main__":
     run_comparison()
+class TheoremProver:
+    def __init__(self, rnd_engine):
+        self.rnd = rnd_engine
+        
+    def _normal_cdf(self, x, mu, sigma):
+        return 0.5 * (1 + math.erf((x - mu) / (sigma * math.sqrt(2.0))))
+    def prove_memoryless_property(self, dist_instance, s, t, M=100000):
+        print("\n" + "=" * 60)
+        print(" EVALUATING MEMORYLESS PROPERTY ")
+        print("=" * 60)
+        
+        samples = [dist_instance.generate_sample() for _ in range(M)]
+        
+        count_gt_t = sum(1 for x in samples if x > t)
+        count_gt_s = sum(1 for x in samples if x > s)
+        count_gt_s_plus_t = sum(1 for x in samples if x > (s + t))
+        
+        p_gt_t = count_gt_t / M
+        p_gt_s = count_gt_s / M
+        p_gt_s_plus_t = count_gt_s_plus_t / M
+        
+        if p_gt_s == 0:
+            print(f"Error: No samples greater than s={s} were generated. Conditional probability cannot be calculated.")
+            return
+            
+        p_conditional = p_gt_s_plus_t / p_gt_s
+        difference = abs(p_conditional - p_gt_t)
+        
+        print(f" P(X > {t}) = {p_gt_t:.6f}")
+        print(f" P(X > {s} + {t} | X > {s}) = {p_conditional:.6f}")
+        print("-" * 60)
+        print(f" Difference (Absolute Error): {difference:.6f}")
+        print("=" * 60)
+
+    def prove_binomial_normal_approximation(self, n, p, a, b, M=100000):
+        print("\n" + "=" * 60)
+        print(" BINOMIAL TO NORMAL APPROXIMATION THEOREM ")
+        print("=" * 60)
+        
+        # Check standard rule of thumb for Binomial Normal Approximation
+        if n < 50:
+            print("Warning: For an appropriate approximation, the value of n should be at least 50.")
+            
+        binom_dist = Binomial(n, p, self.rnd)
+        samples = [binom_dist.generate_sample() for _ in range(M)]
+        
+        count_in_range = sum(1 for x in samples if a <= x <= b)
+        p_empirical = count_in_range / M
+        
+        mu = n * p
+        sigma = math.sqrt(n * p * (1 - p))
+        
+        p_theoretical = self._normal_cdf(b + 0.5, mu, sigma) - self._normal_cdf(a - 0.5, mu, sigma)
+        
+        error = abs((p_theoretical - p_empirical) / p_theoretical) * 100 if p_theoretical != 0 else float('inf')
+        
+        print(f" Empirical P({a} <= X <= {b}) (Binomial): {p_empirical:.6f}")
+        print(f" Theoretical P({a}-0.5 <= X <= {b}+0.5) (Normal): {p_theoretical:.6f}")
+        print("-" * 60)
+        print(f" Relative Error Percentage: {error:.4f}%")
+        print("=" * 60)
+
+    def prove_poisson_normal_approximation(self, lam, a, b, M=100000):
+        print("\n" + "=" * 60)
+        print(" POISSON TO NORMAL APPROXIMATION THEOREM ")
+        print("=" * 60)
+        
+        if lam < 30:
+            print("Warning: For an appropriate approximation, the value of lambda (λ) must be at least 30.")
+            
+        poisson_dist = Poisson(lam, self.rnd)
+        samples = [poisson_dist.generate_sample() for _ in range(M)]
+        
+        count_in_range = sum(1 for x in samples if a <= x <= b)
+        p_empirical = count_in_range / M
+        
+        mu = lam
+        sigma = math.sqrt(lam)
+        
+        p_theoretical = self._normal_cdf(b + 0.5, mu, sigma) - self._normal_cdf(a - 0.5, mu, sigma)
+        
+        error = abs((p_theoretical - p_empirical) / p_theoretical) * 100 if p_theoretical != 0 else float('inf')
+        
+        print(f" Empirical P({a} <= X <= {b}) (Poisson): {p_empirical:.6f}")
+        print(f" Theoretical P({a}-0.5 <= X <= {b}+0.5) (Normal): {p_theoretical:.6f}")
+        print("-" * 60)
+        print(f" Relative Error Percentage: {error:.4f}%")
+        print("=" * 60)
