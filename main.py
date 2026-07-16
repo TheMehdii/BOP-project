@@ -1,6 +1,6 @@
 import math 
 import time
-
+import os
 class Linear_Congruential_Generator:
     def __init__(self):
         current_time = time.time()
@@ -121,7 +121,10 @@ class Poisson(Distribution):
         p = 1.0
         while p > L :
             k += 1
-            p *= self.rnd.next_random_x()
+            u *= self.rnd.next_random_x()
+            while u==0:
+                u = self.rnd.next_random_x()
+            p *= u
         return k - 1
     
 # Continuous distributions
@@ -240,9 +243,8 @@ class StatisticalAnalyzer:
         print(f" Theoretical Variance:    {self.theoretical_var:.6f}")
         print(f" Empirical Variance (S²): {self.empirical_var:.6f}")
         print(f" Absolute Error (Var):     {var_error:.4f}%")
-        print("=" * 60)
-if __name__ == "__main__":
-    run_comparison()
+        print("=" * 60)   
+
 class TheoremProver:
     def __init__(self, rnd_engine):
         self.rnd = rnd_engine
@@ -331,3 +333,23 @@ class TheoremProver:
         print("-" * 60)
         print(f" Relative Error Percentage: {error:.4f}%")
         print("=" * 60)
+green = "\033[92m"
+reset = "\033[0m"
+def menu():
+    print(f"{green} Welcome to Probability and Statistics{reset}")
+    time.sleep(3)
+    print("Running engine motor ...")
+    time.sleep(3)
+    os.system('cls')
+    
+    print("Select avtive Random Engine for sumulation :")
+    print("1. Linear Congruential Generator (LCG)")
+    print("2. Xorshift")
+    choice = input("Enter your choice : ").strip()
+
+    if choice == 2:
+        engine = Xorshift()
+        print("Active engine set to --> Xorshift")
+    else : 
+        engine = Linear_Congruential_Generator()
+        print("Active engine set to : LCG")
